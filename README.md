@@ -1,23 +1,26 @@
-# Windows 11 Notification to Slack Bot
+# Windows Notification to Slack Bot
 
-This bot monitors Windows 11 desktop notifications and forwards them to a Slack workspace.
+This bot monitors Windows desktop notifications and forwards them to a Slack workspace.
 
 ## Features
 
-- Reads Windows 11 notifications directly from the notification database
+- Reads Windows notifications directly from the notification database
 - Sends notifications to Slack workspace
 - Configurable via environment variables
 - No UI required - runs as a background script
+- Works on Windows 10 (1809+) and Windows 11
 
 ## Prerequisites
 
-- Windows 11
-- Python 3.8 or higher
+- Windows 10 or Windows 11
+- Python 3.8 or higher (only needed for building, not for running the executable)
 - A Slack workspace with a bot token
 
 ## Setup Guide
 
-### 1. Install Dependencies
+### Option A: Run as Python Script (Development)
+
+#### 1. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -72,6 +75,25 @@ The bot will:
 - Send them to your Slack channel
 - Run until you press Ctrl+C
 
+### Option B: Build Executable (No Python Required)
+
+To create an executable that doesn't require Python installation:
+
+1. **Run the build script:**
+   ```bash
+   python build.py
+   ```
+
+   This will automatically install PyInstaller if needed and create `wppbot.exe` in the `dist` folder.
+
+2. **Deploy to machines:**
+   - Copy `dist\wppbot.exe` to each machine
+   - Copy `.env` file to the same folder as `wppbot.exe`
+   - Edit `.env` on each machine (set `MACHINE_NAME`, `SLACK_BOT_TOKEN`, `SLACK_CHANNEL`)
+   - Run `wppbot.exe`
+
+**Note:** To stop the executable, use Task Manager (end `wppbot.exe` process).
+
 ## Running on Multiple Machines
 
 **Yes! You can run this bot on multiple PCs and have all notifications sent to the same Slack channel.**
@@ -123,11 +145,23 @@ Time: 2024-12-24T10:30:00
 ## How It Works
 
 The bot reads notifications directly from the Windows notification database (`wpndatabase.db`). It:
-1. Connects to the SQLite database where Windows stores notifications
+1. Connects to the SQLite database where Windows stores notifications (Windows 10/11)
 2. Queries for toast notifications (not tiles)
 3. Extracts title and body from the XML payload
 4. Sends new notifications to Slack
 5. Tracks processed notifications to avoid duplicates
+
+**Windows Compatibility:**
+- ✅ **Windows 10** (version 1809 or later) - Full support
+- ✅ **Windows 11** - Full support
+- The notification database structure is the same in both versions
+- PowerShell fallback method works on both Windows 10 and 11
+
+**Windows Compatibility:**
+- ✅ **Windows 10** (version 1809 or later) - Full support
+- ✅ **Windows 11** - Full support
+- The notification database structure is the same in both versions
+- PowerShell fallback method works on both Windows 10 and 11
 
 ## Troubleshooting Guide
 

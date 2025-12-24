@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import json
 import subprocess
@@ -12,7 +13,15 @@ from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
 # Load environment variables
-load_dotenv()
+# Handle both script execution and PyInstaller executable
+if getattr(sys, 'frozen', False):
+    # Running as compiled executable
+    script_dir = Path(sys.executable).parent
+else:
+    # Running as script
+    script_dir = Path(__file__).parent.absolute()
+env_path = script_dir / '.env'
+load_dotenv(dotenv_path=env_path)
 
 class WindowsNotificationMonitor:
     def __init__(self):
